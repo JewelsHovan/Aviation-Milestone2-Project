@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import os
 import logging
-import random
+import secrets
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -32,9 +32,9 @@ def get_random_dates(start_date: datetime, end_date: datetime, n_samples: int = 
     
     for _ in range(n_samples):
         # Generate random number of days to add
-        days_to_add = random.randint(0, date_range)
+        days_to_add = secrets.SystemRandom().randint(0, date_range)
         # Generate random hour (0-23)
-        random_hour = random.randint(0, 23)
+        random_hour = secrets.SystemRandom().randint(0, 23)
         
         # Create random datetime
         random_date = start_date + timedelta(days=days_to_add)
