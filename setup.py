@@ -3,6 +3,7 @@ import os
 import subprocess
 import venv
 from pathlib import Path
+from security import safe_command
 
 def main():
     # Create data directory structure
@@ -31,7 +32,7 @@ def main():
     install_cmd = f"{activate_cmd} && pip install -r requirements.txt"
     
     try:
-        subprocess.run(install_cmd, shell=False, check=True)
+        safe_command.run(subprocess.run, install_cmd, shell=False, check=True)
         print("Installed requirements successfully")
     except subprocess.CalledProcessError as e:
         print(f"Error installing requirements: {e}")
