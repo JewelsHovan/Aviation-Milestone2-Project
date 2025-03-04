@@ -1,9 +1,13 @@
-import numpy as np
+
 from dtaidistance import dtw_ndim
 from scipy.interpolate import interp1d
+import numpy as np
+from fastdtw import fastdtw
+from scipy.spatial.distance import euclidean
+from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import StandardScaler
 
-
-# Commercial Flight: Straight path with minimal fluctuations
+# # # Commercial Flight: Straight path with minimal fluctuations
 def commercial_prototype():
     t = np.linspace(0, 30, 30)  # 30 minutes, sampled every minute
     lats = np.linspace(33.7490, 33.7550, 30)  # Small change in latitude
@@ -67,27 +71,6 @@ def private_prototype():
 
     return list(zip(lats, lons, altitudes, speeds))
 
-# Aerobatic Flight: Sharp turns and rapid altitude changes
-def aerobatic_prototype():
-    t = np.linspace(0, 30, 30)
-    lats = 33.7500 + 0.02 * np.random.randn(30)  # Frequent large latitude changes
-    lons = -84.3870 + 0.02 * np.random.randn(30)  # Frequent large longitude changes
-    altitudes = np.linspace(1000, 1200, 30)  # Rapid altitude changes
-    speeds = np.linspace(400, 450, 30)  # High and increasing speed
-
-    return list(zip(lats, lons, altitudes, speeds))
-
-
-# Smooth Path Function (for optional smoothing)
-def smooth_path(path, window_size=3):
-    smoothed_path = []
-    for i in range(len(path)):
-        # Smooth over a sliding window
-        start = max(0, i - window_size // 2)
-        end = min(len(path), i + window_size // 2 + 1)
-        smoothed_point = np.mean(path[start:end], axis=0)
-        smoothed_path.append(smoothed_point)
-    return smoothed_path
 
 
 def normalize_path(path, num_points=100, weights=None):
@@ -111,9 +94,7 @@ def normalize_path(path, num_points=100, weights=None):
 
 
 
-# Function to calculate DTW distance with a dynamic warping window constraint
-def calculate_dtw_distance(path1, path2, window=5):
-    """Computes DTW distance with a dynamic warping window constraint."""
+def dtw_distance(path1, path2, window =  5, slope=1):
     len_path1 = len(path1)
     len_path2 = len(path2)
 
@@ -122,109 +103,61 @@ def calculate_dtw_distance(path1, path2, window=5):
         window = max(window, int(abs(len_path1 - len_path2) / 2))
 
     return dtw_ndim.distance(path1, path2, window=window)
-                        
+    
 
-def classify_flight_path(path, speed_weight=2.0, altitude_weight=2.0):
-    """Classifies a flight path using weighted DTW.""" 
-    # Define prototype flight paths
+# Function to perform DTW matching with parameter tuning
+def match_flight_to_prototypes(flight_data, speed_weight=2.0, altitude_weight=2.0):
     prototypes = {
-        'Commercial Flight': commercial_prototype(),
-        'Training Flight': training_prototype(),
-        'Surveillance Flight': surveillance_prototype(),
-        'Private Flight': private_prototype(),
+        "Commercial": commercial_prototype(),
+        "Training": training_prototype(),
+        "Surveillance": surveillance_prototype(),
+        "Private": private_prototype(),
+        # Add other prototypes here
     }
 
     # Define weights (higher weight on speed)
     feature_weights = np.array([1.0, 1.0, altitude_weight, speed_weight])  
 
     # Normalize and apply weights
-    norm_path = normalize_path(path, weights=feature_weights)
+    norm_path = normalize_path(flight_data, weights=feature_weights)
     norm_prototypes = {label: normalize_path(prototype, weights=feature_weights) for label, prototype in prototypes.items()}
 
-    # Compute DTW distances
-    distances = {label: calculate_dtw_distance(norm_path, prototype) for label, prototype in norm_prototypes.items()}
+    # Scaling flight_data (optional, for tuning)
+    scaler = StandardScaler()
+    scaled_flight_data = scaler.fit_transform(norm_path)
 
-    # Find the best match
-    best_match = min(distances, key=distances.get)
+    results = {}
+    silhouette_scores = {}
 
-    print(distances)
-    return best_match
+    # Tuning parameters for DTW
+    window_sizes = [20, 30]  # Example window sizes for tuning
 
+    # Perform DTW matching for each prototype with parameter tuning
+    for label, prototype in norm_prototypes.items():
+        scaled_prototype = scaler.transform(prototype)
 
+        # Tuning DTW parameters
+        tuned_results = {}
+        for window in window_sizes:                     
+                distance = dtw_distance(scaled_flight_data, scaled_prototype, window=window)
+                print("Distance:", distance)
+                tuned_results[window] = distance
 
-import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
+                # Compute silhouette score for clustering (optional)
+                combined_data = np.vstack([scaled_flight_data, scaled_prototype])
+                silhouette = silhouette_score(combined_data, [0] * len(scaled_flight_data) + [1] * len(scaled_prototype))
+                silhouette_scores[window] = silhouette
 
-def plot_prototypes():
-    # Define the prototypes
-    prototypes = {
-        'Commercial Flight': commercial_prototype(),
-        'Training Flight': training_prototype(),
-        'Surveillance Flight': surveillance_prototype(),        
-        'Private Flight': private_prototype(),
-    }
+        # Get best tuned match based on minimum DTW distance
+        best_tuned_params = min(tuned_results, key=tuned_results.get)
+        results[label] = tuned_results[best_tuned_params]
+
+        # Calculate confidence score (1 / (1 + DTW distance))
+        confidence_score = 1 / (1 + results[label])
+
+    # Get the overall best match based on minimum DTW distance
+    best_match = min(results, key=results.get)
     
-     # Determine the number of prototypes
-    n_prototypes = len(prototypes)
-
-    # Define the grid layout (e.g., 2 rows, 3 columns)
-    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
-    
-    # Flatten the axes array for easier iteration
-    axes = axes.flatten()
-
-    # Plot each prototype path on a different subplot
-    for i, (label, path) in enumerate(prototypes.items()):
-        lats, lons = zip(*[(lat, lon) for lat, lon, _, _ in path])  # Unpack only lat, lon
-        
-        # Plot on the corresponding subplot
-        ax = axes[i]
-        ax.plot(lons, lats, label=label, marker='o', markersize=5)
-        
-        # Customize the subplot
-        ax.set_title(label)
-        ax.set_xlabel('Longitude')
-        ax.set_ylabel('Latitude')
-        ax.legend()
-        ax.grid(True)
-
-     # Hide any empty subplots
-    for j in range(n_prototypes, len(axes)):
-        axes[j].axis('off')
-
-
-    # Adjust layout to prevent overlap and show the plot
-    plt.tight_layout()
-    plt.show()
-
-
-
-def test_prototypes():
-    prototypes = {
-        'Commercial Flight': commercial_prototype(),
-        'Training Flight': training_prototype(),
-        'Surveillance Flight': surveillance_prototype(),
-        'Cargo Flight': cargo_prototype(),
-        'Emergency Flight': emergency_prototype(),
-        'Private Flight': private_prototype(),
-        'Aerobatic Flight': aerobatic_prototype(),
-    }
-
-    smoothed_prototypes = {label: smooth_path(prototype) for label, prototype in prototypes.items()}
-    
-    # Calculate DTW distance between input path and each prototype
-    distances = {label: calculate_dtw_distance(prototype, prototype) for label, prototype in smoothed_prototypes.items()}
-    
-    # Find the minimum distance
-    min_distance = min(distances.values())
-
-    # Find all labels that match the minimum distance
-    best_matches = [label for label, dist in distances.items() if dist == min_distance]
-
-    print("Best matches:", best_matches)
-
-# Call the function to plot the prototypes
-# test_prototypes()
-plot_prototypes()
+    return best_match, results, confidence_score, silhouette_scores
 
 
