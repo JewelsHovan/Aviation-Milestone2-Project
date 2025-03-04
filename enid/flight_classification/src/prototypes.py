@@ -105,10 +105,6 @@ def dtw_distance(path1, path2, window =  5, slope=1):
     return dtw_ndim.distance(path1, path2, window=window)
     
 
-
-
-
-
 # Function to perform DTW matching with parameter tuning
 def match_flight_to_prototypes(flight_data, speed_weight=2.0, altitude_weight=2.0):
     prototypes = {
