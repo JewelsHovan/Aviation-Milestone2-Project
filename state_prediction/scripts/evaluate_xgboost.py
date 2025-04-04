@@ -9,11 +9,12 @@ multiple error metrics including MSE, RMSE, and MAE.
 import os
 import numpy as np
 import pandas as pd
-import pickle
 import json
 import time
 import argparse
 import matplotlib
+import fickling
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
@@ -179,9 +180,9 @@ def main():
     
     # Load scalers
     with open(PATHS.scalers_dir / 'X_scaler.pkl', 'rb') as f:
-        X_scaler = pickle.load(f)
+        X_scaler = fickling.load(f)
     with open(PATHS.scalers_dir / 'y_scaler.pkl', 'rb') as f:
-        y_scaler = pickle.load(f)
+        y_scaler = fickling.load(f)
     
     # 2. Load models
     models, feature_list = load_xgboost_models(target_var)

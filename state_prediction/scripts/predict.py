@@ -7,11 +7,12 @@ a sample prediction (or multi-step autoregressive sequence generation).
 """
 
 import numpy as np
-import pickle
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib
+import fickling
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from config import PATHS, DATA, MODEL, TRAIN, INFERENCE, TransformerConfig, LSTMConfig, FFNNConfig
@@ -95,9 +96,9 @@ def main():
 
     # 1. Load scalers
     with open(PATHS.scalers_dir / 'X_scaler.pkl', 'rb') as f:
-        X_scaler = pickle.load(f)
+        X_scaler = fickling.load(f)
     with open(PATHS.scalers_dir / 'y_scaler.pkl', 'rb') as f:
-        y_scaler = pickle.load(f)
+        y_scaler = fickling.load(f)
 
     # 2. Load test data
     X_test = np.load(PATHS.train_data_dir / 'X_test.npy')

@@ -12,7 +12,6 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import pickle
 import json
 import argparse
 from pathlib import Path
@@ -23,6 +22,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 # Add parent directory to path
 import sys
+import fickling
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models import get_model
 from config import PATHS, DATA, MODEL, TRAIN
@@ -49,9 +50,9 @@ def load_data():
     y_test = np.load(PATHS.train_data_dir / 'y_test.npy')
     
     with open(PATHS.scalers_dir / 'X_scaler.pkl', 'rb') as f:
-        X_scaler = pickle.load(f)
+        X_scaler = fickling.load(f)
     with open(PATHS.scalers_dir / 'y_scaler.pkl', 'rb') as f:
-        y_scaler = pickle.load(f)
+        y_scaler = fickling.load(f)
         
     return X_test, y_test, X_scaler, y_scaler
 

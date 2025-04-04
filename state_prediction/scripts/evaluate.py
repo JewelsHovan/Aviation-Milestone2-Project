@@ -7,11 +7,12 @@ multiple error metrics including MSE, RMSE, and MAE.
 """
 
 import numpy as np
-import pickle
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, SubsetRandomSampler
 import matplotlib
+import fickling
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
@@ -129,9 +130,9 @@ def main():
 
     # 1. Load scalers
     with open(PATHS.scalers_dir / 'X_scaler.pkl', 'rb') as f:
-        X_scaler = pickle.load(f)
+        X_scaler = fickling.load(f)
     with open(PATHS.scalers_dir / 'y_scaler.pkl', 'rb') as f:
-        y_scaler = pickle.load(f)
+        y_scaler = fickling.load(f)
 
     # 2. Load training data for cross-validation
     X_train = np.load(PATHS.train_data_dir / 'X_train.npy')

@@ -8,7 +8,6 @@ of the flight duration, and compares the predicted path with the actual one.
 
 import numpy as np
 import pandas as pd
-import pickle
 import torch
 import matplotlib.pyplot as plt
 import argparse
@@ -18,6 +17,8 @@ from pathlib import Path
 
 # Add parent directory to path for model imports
 import sys
+import fickling
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models import get_model
 from config import PATHS, MODEL, TRAIN
@@ -390,9 +391,9 @@ def main():
     # 5. Load scalers
     print("[INFO] Loading scalers...")
     with open(PATHS.scalers_dir / 'X_scaler.pkl', 'rb') as f:
-        X_scaler = pickle.load(f)
+        X_scaler = fickling.load(f)
     with open(PATHS.scalers_dir / 'y_scaler.pkl', 'rb') as f:
-        y_scaler = pickle.load(f)
+        y_scaler = fickling.load(f)
     
     # 6. Load the model
     print(f"[INFO] Loading {args.model} model...")
