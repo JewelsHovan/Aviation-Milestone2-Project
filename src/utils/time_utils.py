@@ -1,6 +1,6 @@
 # time_utils.py
 from datetime import datetime, timedelta
-import random
+import secrets
 
 def parse_date(date_str: str) -> datetime:
     """
@@ -23,6 +23,6 @@ def sample_dates(start_dt: datetime, end_dt: datetime, n: int) -> list[datetime]
     total_seconds = (end_dt - start_dt).total_seconds()
     random_dates = []
     for _ in range(n):
-        offset = random.uniform(0, total_seconds)
+        offset = secrets.SystemRandom().uniform(0, total_seconds)
         random_dates.append(start_dt + timedelta(seconds=offset))
     return random_dates

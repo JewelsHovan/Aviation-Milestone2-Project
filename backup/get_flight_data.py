@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import logging
 from pathlib import Path
-import random
+import secrets
 
 # Configure logging
 logging.basicConfig(
@@ -45,7 +45,7 @@ def get_sample_dates(months_back: int = 12, samples_per_month: int = 2) -> list[
             days_in_month = (next_month - timedelta(days=next_month.day)).day
         
         # Get random days from the month
-        random_days = sorted(random.sample(range(1, days_in_month + 1), min(samples_per_month, days_in_month)))
+        random_days = sorted(secrets.SystemRandom().sample(range(1, days_in_month + 1), min(samples_per_month, days_in_month)))
         
         # Create datetime objects for each sample day
         for day in random_days:
@@ -85,7 +85,7 @@ def collect_flight_samples(
             date_str = sample_date.strftime("%Y%m%d_%H%M")
             
             # Set time window
-            start_time = sample_date.replace(hour=random.randint(6, 20), minute=0)  # Random hour between 6AM and 8PM
+            start_time = sample_date.replace(hour=secrets.SystemRandom().randint(6, 20), minute=0)  # Random hour between 6AM and 8PM
             end_time = start_time + timedelta(hours=sample_duration_hours)
             
             logger.info(f"Collecting sample for {start_time} to {end_time}")

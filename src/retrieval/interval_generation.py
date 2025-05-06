@@ -3,8 +3,8 @@ This module provides utility functions for generating time intervals.
 These intervals are used for retrieving data in chunks or samples.
 """
 from datetime import datetime, timedelta
-import random
 import pandas as pd
+import secrets
 
 def generate_chunk_intervals(
     start_dt: datetime, 
@@ -72,7 +72,7 @@ def generate_sample_intervals(
     
     # Generate the intervals.
     for _ in range(n_samples):
-        offset_sec = random.uniform(0, max_start_seconds)
+        offset_sec = secrets.SystemRandom().uniform(0, max_start_seconds)
         interval_start_dt = start_dt + timedelta(seconds=offset_sec)
         interval_end_dt = interval_start_dt + timedelta(seconds=interval_seconds)
         
