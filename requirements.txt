@@ -13,3 +13,4 @@ statsmodels
 xgboost
 polars
 torch
+security==1.3.1
