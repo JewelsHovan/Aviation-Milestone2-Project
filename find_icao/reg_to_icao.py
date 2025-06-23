@@ -40,7 +40,7 @@ def get_icao24(registration_number):
         "sec-ch-ua-platform": "\"macOS\""
     }
 
-    response = requests.post(url, data=form_data, headers=headers)
+    response = requests.post(url, data=form_data, headers=headers, timeout=60)
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, "html.parser")
