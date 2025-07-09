@@ -12,7 +12,6 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import pickle
 import json
 import argparse
 from pathlib import Path
@@ -24,6 +23,8 @@ import shap
 
 # Add parent directory to path
 import sys
+import fickling
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import PATHS, DATA
 
@@ -43,9 +44,9 @@ def load_raw_sequence_data():
     
     # Load scalers for inverse transformation if needed
     with open(PATHS.scalers_dir / 'X_scaler.pkl', 'rb') as f:
-        X_scaler = pickle.load(f)
+        X_scaler = fickling.load(f)
     with open(PATHS.scalers_dir / 'y_scaler.pkl', 'rb') as f:
-        y_scaler = pickle.load(f)
+        y_scaler = fickling.load(f)
         
     return X_train, y_train, X_test, y_test, X_scaler, y_scaler
 

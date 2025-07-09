@@ -10,12 +10,13 @@ This script can be run independently to generate visualizations using a trained 
 
 import numpy as np
 import matplotlib
+import fickling
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 import torch
-import pickle
 import argparse
 import json
 import sys
@@ -459,9 +460,9 @@ def main():
     
     # Load scalers
     with open(PATHS.scalers_dir / 'X_scaler.pkl', 'rb') as f:
-        X_scaler = pickle.load(f)
+        X_scaler = fickling.load(f)
     with open(PATHS.scalers_dir / 'y_scaler.pkl', 'rb') as f:
-        y_scaler = pickle.load(f)
+        y_scaler = fickling.load(f)
     
     # Load test data
     X_test = np.load(PATHS.train_data_dir / 'X_test.npy')

@@ -15,10 +15,11 @@ import json
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader, TensorDataset
-import pickle
 from paths import DATA_DIR
 from config import DataConfig, PATHS, DATA, MODEL, TRAIN, PathConfig
 import sys
+import fickling
+
 sys.path.append(str(Path(__file__).parent.parent))
 from models import get_model
 
@@ -42,9 +43,9 @@ def load_data():
     
     # Load scalers
     with open(PATHS.scalers_dir / 'X_scaler.pkl', 'rb') as f:
-        X_scaler = pickle.load(f)
+        X_scaler = fickling.load(f)
     with open(PATHS.scalers_dir / 'y_scaler.pkl', 'rb') as f:
-        y_scaler = pickle.load(f)
+        y_scaler = fickling.load(f)
     
     return X_train, y_train, X_test, y_test, X_scaler, y_scaler
 

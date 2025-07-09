@@ -11,11 +11,12 @@ import pandas as pd
 import json
 import argparse
 from pathlib import Path
-import pickle
 import xgboost as xgb
 
 # Add parent directory to path
 import sys
+import fickling
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import PATHS, DATA
 from train_xgboost import engineer_features  # Reuse feature engineering function
@@ -150,9 +151,9 @@ def predict_trajectory(initial_sequence, models, feature_list, num_steps=10, sca
 def load_scalers():
     """Load the scalers used during training"""
     with open(PATHS.scalers_dir / 'X_scaler.pkl', 'rb') as f:
-        X_scaler = pickle.load(f)
+        X_scaler = fickling.load(f)
     with open(PATHS.scalers_dir / 'y_scaler.pkl', 'rb') as f:
-        y_scaler = pickle.load(f)
+        y_scaler = fickling.load(f)
     return X_scaler, y_scaler
 
 def parse_args():
