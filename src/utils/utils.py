@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-import random
+import secrets
 
 def parse_date(date_str: str) -> datetime:
     """
@@ -32,7 +32,7 @@ def sample_dates(start, stop, n):
 
     # Generate n random datetime objects
     random_dates = [
-        start + timedelta(seconds=random.uniform(0, total_seconds))
+        start + timedelta(seconds=secrets.SystemRandom().uniform(0, total_seconds))
         for _ in range(n)
     ]
     return random_dates
